@@ -40,23 +40,23 @@ func (mc *MonopatinController) CreateMonopatin(w http.ResponseWriter, r *http.Re
 }
 
 func (mc *MonopatinController) DeleteMonopatin(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	number, err := strconv.ParseUint(id, 10, 64)
+	id_param := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(id_param, 10, 64)
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), 400)
 		return
 	}
-	mc.repo.DeleteMonopatin(uint(number))
+	mc.repo.DeleteMonopatin(id)
 }
 
 func (mc *MonopatinController) GetMonopatin(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	number, err := strconv.ParseUint(id, 10, 64)
+	id_param := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(id_param, 10, 64)
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), 400)
 		return
 	}
-	monopatin, er := mc.repo.GetMonopatin(uint(number))
+	monopatin, er := mc.repo.GetMonopatin(id)
 	if er != nil {
 		http.Error(w, "Internal error: "+er.Error(), 500)
 		return
@@ -67,7 +67,7 @@ func (mc *MonopatinController) GetMonopatin(w http.ResponseWriter, r *http.Reque
 func (mc *MonopatinController) GetAllMonopatin(w http.ResponseWriter, r *http.Request) {
 	all, err := mc.repo.ListMonopatines()
 	if err != nil {
-		http.Error(w, "Internal error"+err.Error(), 500)
+		http.Error(w, "Internal error "+err.Error(), 500)
 		return
 	}
 	render.JSON(w, r, all)
@@ -111,8 +111,8 @@ func (mc *MonopatinController) GetUltimoMonopatin(w http.ResponseWriter, r *http
 }
 
 func (mc *MonopatinController) UpdateKilometrosYCoordenadas(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	number, err := strconv.ParseUint(id, 10, 64)
+	id_param := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(id_param, 10, 64)
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), 400)
 		return
@@ -129,19 +129,19 @@ func (mc *MonopatinController) UpdateKilometrosYCoordenadas(w http.ResponseWrite
 		http.Error(w, "Bad Request "+err2.Error(), 400)
 		return
 	}
-	kilometros_param := chi.URLParam(r, "rango")
+	kilometros_param := chi.URLParam(r, "kilometros")
 	kilometros, err3 := strconv.ParseFloat(kilometros_param, 64)
 	if err3 != nil {
 		http.Error(w, "Bad Request "+err3.Error(), 400)
 		return
 	}
 
-	errU := mc.repo.UpdateKilometrosYCoordenadas(uint(number), kilometros, latitud, longitud)
+	errU := mc.repo.UpdateKilometrosYCoordenadas(id, kilometros, latitud, longitud)
 	if errU != nil {
 		http.Error(w, "Internal error: "+errU.Error(), 500)
 		return
 	}
-	monopatin, errQ := mc.repo.GetMonopatin(uint(number))
+	monopatin, errQ := mc.repo.GetMonopatin(id)
 	if errQ != nil {
 		http.Error(w, "Internal error: "+errQ.Error(), 500)
 		return
@@ -151,24 +151,24 @@ func (mc *MonopatinController) UpdateKilometrosYCoordenadas(w http.ResponseWrite
 
 func (mc *MonopatinController) UpdateParada(w http.ResponseWriter, r *http.Request) {
 	id_param := chi.URLParam(r, "id")
-	id, err := strconv.ParseUint(id_param, 10, 64)
+	id, err := strconv.ParseInt(id_param, 10, 64)
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), 400)
 		return
 	}
-	id_parada_param := chi.URLParam(r, "latitud")
-	id_parada, err1 := strconv.ParseFloat(id_parada_param, 64)
+	id_parada_param := chi.URLParam(r, "parada")
+	id_parada, err1 := strconv.ParseInt(id_parada_param, 10, 64)
 	if err1 != nil {
 		http.Error(w, "Bad Request "+err1.Error(), 400)
 		return
 	}
 
-	err = mc.ms.UpdateParada(uint(id), uint(id_parada))
+	err = mc.ms.UpdateParada(id, id_parada)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	monopatin, errQ := mc.repo.GetMonopatin(uint(id))
+	monopatin, errQ := mc.repo.GetMonopatin(id)
 	if errQ != nil {
 		http.Error(w, "Internal error: "+errQ.Error(), 500)
 		return
@@ -179,19 +179,19 @@ func (mc *MonopatinController) UpdateParada(w http.ResponseWriter, r *http.Reque
 func (mc *MonopatinController) UpdateEstado(w http.ResponseWriter, r *http.Request) {
 	// TODO: chequear rol
 	id_param := chi.URLParam(r, "id")
-	id, err := strconv.ParseUint(id_param, 10, 64)
+	id, err := strconv.ParseInt(id_param, 10, 64)
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), 400)
 		return
 	}
 	estado := chi.URLParam(r, "estado")
 
-	err = mc.repo.UpdateEstado(uint(id), estado)
+	err = mc.repo.UpdateEstado(id, estado)
 	if err != nil {
 		http.Error(w, "Internal error: "+err.Error(), 500)
 		return
 	}
-	monopatin, errQ := mc.repo.GetMonopatin(uint(id))
+	monopatin, errQ := mc.repo.GetMonopatin(id)
 	if errQ != nil {
 		http.Error(w, "Internal error: "+errQ.Error(), 500)
 		return

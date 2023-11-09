@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -16,15 +17,22 @@ func NewSqlClient(source string) *MySqlClient {
 		panic(err)
 	}
 
-	err = db.Ping()
+	db.Exec(`CREATE TABLE IF NOT EXISTS parada (
+            id  bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            diametro float NOT NULL,
+            latitud float NOT NULL,
+            longitud float NOT NULL
+    )`)
 
-	if err != nil {
-        panic(err)
-	}
-
+	db.Exec(`CREATE TABLE IF NOT EXISTS monopatin (
+        id bigint not null auto_increment PRIMARY KEY,
+        kilometros float NOT NULL,
+        latitud float NOT NULL,
+        longitud float NOT NULL,
+        ultimo_mantenimiento  date NOT NULL,
+        estado char(1) NOT NULL,
+        id_parada bigint,
+        FOREIGN KEY (id_parada) REFERENCES parada(id)
+    )`)
 	return &MySqlClient{db}
-}
-
-func (c *MySqlClient) ViewStats() sql.DBStats{
-	return c.Stats()
 }

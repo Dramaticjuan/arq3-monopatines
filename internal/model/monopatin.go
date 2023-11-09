@@ -1,16 +1,17 @@
 package model
 
 import (
-	"database/sql"
 	"time"
+
+	"gopkg.in/guregu/null.v3"
 )
 
 type Monopatin struct {
-	ID                  uint64
+	ID                  int
 	Kilometros          float64
 	Latitud             float64
 	Longitud            float64
 	UltimoMantenimiento time.Time
 	Estado              string
-	IDParada            sql.NullInt32
+    IDParada            null.Int
 }
